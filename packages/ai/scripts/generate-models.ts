@@ -586,7 +586,8 @@ function isAnthropicTemperatureUnsupportedModel(modelId: string): boolean {
 
 const OPENAI_COMPLETIONS_DEFAULT_COMPAT = {
 	supportsStore: true,
-	supportsDeveloperRole: true,
+	// Developer role suppressed by default; explicit compat opts back in.
+	supportsDeveloperRole: false,
 	supportsReasoningEffort: true,
 	supportsUsageInStreaming: true,
 	supportsFinishReason: true,
@@ -678,7 +679,7 @@ function detectOpenAICompletionsCompat(model: Model<"openai-completions">): Open
 
 	return {
 		supportsStore: !isNonStandard,
-		supportsDeveloperRole: isOpenRouterDeveloperRoleModel || (!isNonStandard && !isOpenRouter),
+		supportsDeveloperRole: isOpenRouterDeveloperRoleModel,
 		supportsReasoningEffort:
 			!isGrok && !isZai && !isMoonshot && !isTogether && !isCloudflareAiGateway && !isNvidia && !isAntLing,
 		supportsUsageInStreaming: true,

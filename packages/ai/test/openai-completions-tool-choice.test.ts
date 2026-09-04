@@ -1123,7 +1123,7 @@ describe("openai-completions tool_choice", () => {
 		}
 	});
 
-	it("keeps developer messages for OpenAI reasoning model instructions", async () => {
+	it("uses system messages for OpenAI reasoning model instructions by default", async () => {
 		const { compat: _compat, ...baseModel } = getModel("openai", "gpt-5.5")!;
 		const model = { ...baseModel, api: "openai-completions" } as const;
 		let payload: unknown;
@@ -1143,7 +1143,7 @@ describe("openai-completions tool_choice", () => {
 		).result();
 
 		const params = payload as { messages?: Array<{ role?: string }> };
-		expect(params.messages?.[0]?.role).toBe("developer");
+		expect(params.messages?.[0]?.role).toBe("system");
 	});
 
 	it("stores OpenRouter Kimi K2.6 reasoning replay compat in built-in metadata", () => {

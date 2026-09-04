@@ -4,6 +4,7 @@
 
 ### Changed
 
+- OpenAI Completions now sends the system prompt with the `system` role by default instead of `developer` for reasoning models; OpenRouter's anthropic/openai routes keep `developer`, and explicit `compat.supportsDeveloperRole: true` opts back in.
 - `sleep()` now accepts an optional `AbortSignal`; removed duplicate local sleep helpers from `openai-codex-responses.ts` and downstream packages.
 
 ### Added

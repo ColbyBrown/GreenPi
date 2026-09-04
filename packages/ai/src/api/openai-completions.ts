@@ -1631,7 +1631,9 @@ function detectCompat(model: Model<"openai-completions">): ResolvedOpenAIComplet
 
 	return {
 		supportsStore: !isNonStandard,
-		supportsDeveloperRole: isOpenRouterDeveloperRoleModel || (!isNonStandard && !isOpenRouter),
+		// Developer role is suppressed by default; OpenRouter's anthropic/openai
+		// routes are the documented exception. Explicit model.compat opts back in.
+		supportsDeveloperRole: isOpenRouterDeveloperRoleModel,
 		supportsReasoningEffort:
 			!isGrok && !isZai && !isMoonshot && !isTogether && !isCloudflareAiGateway && !isNvidia && !isAntLing,
 		supportsUsageInStreaming: true,
