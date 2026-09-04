@@ -168,7 +168,12 @@ async function runAuthCommand(args: string[]): Promise<boolean> {
 		}
 		if (command.kind !== "check") {
 			const signal = AbortSignal.timeout(15_000);
-			const modelRuntime = await ModelRuntime.create({ allowModelNetwork: false, signal });
+			const modelRuntime = await ModelRuntime.create({
+				allowModelNetwork: false,
+				signal,
+				// Credential printing must see every built-in provider.
+				allBuiltinProviders: true,
+			});
 			const credential = await resolveCredentialForPrint(
 				parsed,
 				modelRuntime,

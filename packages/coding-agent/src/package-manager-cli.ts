@@ -589,6 +589,9 @@ async function refreshModelCatalogs(agentDir: string): Promise<void> {
 			modelsPath: join(agentDir, "models.json"),
 			allowModelNetwork: false,
 			signal: controller.signal,
+			// Catalog refresh covers every built-in provider, not just the
+			// presented defaults.
+			allBuiltinProviders: true,
 		});
 		const result = await modelRuntime.refresh({
 			allowNetwork: true,

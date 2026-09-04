@@ -1,61 +1,74 @@
 # Providers
 
-Pi supports subscription-based providers via OAuth and API key providers via environment variables or auth file. Built-in catalogs ship with pi; configured providers may refresh newer catalogs and cache them in `~/.pi/agent/models-store.json` for offline use.
+Pi ships with a default set of providers focused on European cloud inference and local models: **GreenPT** and **Viro AI** (OpenAI-compatible cloud APIs), plus **LM Studio**, **Ollama**, **vLLM**, and **llama.cpp server** for local inference. Other built-in providers (Anthropic, OpenAI, Google, etc.) remain in the provider catalog but are not registered by pi by default; see [Other Built-in Providers](#other-built-in-providers).
 
 ## Table of Contents
 
-- [Subscriptions](#subscriptions)
+- [Default Providers](#default-providers)
+- [Other Built-in Providers](#other-built-in-providers)
 - [API Keys](#api-keys)
-- [Auth File](#auth-file)
 - [Cloud Providers](#cloud-providers)
 - [llama.cpp](#llamacpp)
 - [Custom Providers](#custom-providers)
 - [Resolution Order](#resolution-order)
 
-## Subscriptions
+## Default Providers
 
-Use `/login` in interactive mode, then select a provider:
+These providers are offered by `/login`, `/model`, and first-run setup. All of them speak the OpenAI Completions API.
 
-- ChatGPT Plus/Pro (Codex)
-- Claude Pro/Max
-- GitHub Copilot
-- xAI (Grok/X subscription)
-- OpenRouter (OAuth-minted API key billed from OpenRouter credits)
-- Radius
+### GreenPT
 
-Use `/logout` to clear credentials. Tokens are stored in `~/.pi/agent/auth.json` and auto-refresh when expired. OpenRouter instead mints a user-controlled API key that does not expire automatically.
+European OpenAI-compatible API ([docs.greenpt.ai](https://docs.greenpt.ai)) with a curated catalog (GLM, Kimi, DeepSeek, Qwen, MiniMax, Gemma, GPT-OSS, and GreenPT's own models).
 
-### OpenAI Codex
+```bash
+export GREENPT_API_KEY=...
+# or: /login greenpt
+pi --provider greenpt --model glm-5.2
+```
 
-- Requires ChatGPT Plus or Pro subscription
-- Officially endorsed by OpenAI: [Codex for OSS](https://developers.openai.com/community/codex-for-oss)
+### Viro AI
 
-### Claude Pro/Max
+OpenAI-compatible API at `https://ai.viro.app/api`. Models are discovered dynamically from the server (`GET /models`).
 
-Anthropic subscription auth is active for Claude Pro/Max accounts. Third-party harness usage draws from [extra usage](https://claude.ai/settings/usage) and is billed per token, not against Claude plan limits.
+```bash
+export VIRO_API_KEY=...
+# or: /login viro
+pi --provider viro
+```
 
-### GitHub Copilot
+### Local Inference Servers
 
-- Press Enter for github.com, or enter your GitHub Enterprise Server domain
-- If you get "model not supported", enable it in VS Code: Copilot Chat → model selector → select model → "Enable"
+LM Studio, Ollama, vLLM, and llama.cpp server run locally and need no API key (optional env vars are supported). Pi discovers their models from the OpenAI-compatible `GET /models` endpoint at startup.
 
-### xAI (Grok/X subscription)
+| Provider | Default endpoint | Optional key env var |
+|----------|------------------|----------------------|
+| LM Studio | `http://localhost:1234/v1` | `LMSTUDIO_API_KEY` |
+| Ollama | `http://localhost:11434/v1` | `OLLAMA_API_KEY` |
+| vLLM | `http://localhost:8000/v1` | `VLLM_API_KEY` |
+| llama.cpp server | `http://localhost:8080/v1` | `LLAMA_CPP_API_KEY` |
 
-- Run `/login xai`, then select **Use a subscription**
-- `XAI_API_KEY` remains available through **Use an API key**
+Start the server, then:
 
-### OpenRouter
+```bash
+pi --provider lmstudio      # or ollama / vllm / llama-cpp
+```
 
-- Run `/login openrouter`, then select **Sign in with OpenRouter** to open the OpenRouter PKCE authorization flow
-- The authorization creates a user-controlled OpenRouter API key billed from your OpenRouter credits
-- On remote/headless machines (e.g. over SSH) the browser cannot reach the loopback callback; paste the final redirect URL (or the authorization code) into the login prompt instead
-- `OPENROUTER_API_KEY` remains available through **Use an API key**
+Discovered models assume a 128k context window and 8k output; override per model with `models.json` `modelOverrides` (see [models.md](models.md)).
 
-### Radius
+## Other Built-in Providers
 
-Radius is a dynamic `pi-messages` gateway. `/login radius` stores OAuth tokens in `auth.json`; the gateway catalog is refreshed independently and cached in `models-store.json`. Custom Radius gateways can be declared in `models.json` with `"oauth": "radius"` and a gateway `baseUrl`.
+The provider catalog also contains cloud API-key and subscription providers (Anthropic, OpenAI, Google, Amazon Bedrock, Groq, xAI, OpenRouter, and many more — see the [API Keys](#api-keys) table below for the full list). They are not registered by pi's default runtime, but remain available:
+
+- **Via `models.json`:** declare the provider as a custom provider with its `baseUrl` and API (see [models.md](models.md)).
+- **Via the SDK:** `ModelRuntime.create({ allBuiltinProviders: true })` registers the full catalog.
+
+Subscription OAuth providers (ChatGPT/Codex, Claude Pro/Max, GitHub Copilot, xAI, OpenRouter, Radius) are not offered by `/login` in the default runtime.
+
+The sections below document these providers as catalog reference.
 
 ## API Keys
+
+These providers are not registered by pi's default runtime (see [Other Built-in Providers](#other-built-in-providers)); the table documents their credentials for `models.json` and SDK usage.
 
 ### Environment Variables or Auth File
 

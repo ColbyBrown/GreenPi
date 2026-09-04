@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Removed unused `src/client/index.ts` re-export barrel and `src/utils/deprecation.ts` (no callers).
+
+### Changed
+
+- Default model providers are now GreenPT, Viro AI, and local inference (LM Studio, Ollama, vLLM, llama.cpp server); other built-in cloud providers are no longer registered by the default runtime and must be declared via `models.json` or enabled with `ModelRuntime.create({ allBuiltinProviders: true })`.
+
 ### Fixed
 
 - Fixed configurable save keybindings in the model and thinking selectors ([#8797](https://github.com/earendil-works/pi/issues/8797)).

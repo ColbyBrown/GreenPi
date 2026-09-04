@@ -72,7 +72,13 @@ export type KnownProvider =
 	| "xiaomi"
 	| "xiaomi-token-plan-cn"
 	| "xiaomi-token-plan-ams"
-	| "xiaomi-token-plan-sgp";
+	| "xiaomi-token-plan-sgp"
+	| "greenpt"
+	| "viro"
+	| "lmstudio"
+	| "ollama"
+	| "vllm"
+	| "llama-cpp";
 export type ProviderId = KnownProvider | string;
 
 export type KnownImagesProvider = "openrouter";

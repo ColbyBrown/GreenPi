@@ -16,9 +16,11 @@ import { fireworksProvider } from "./fireworks.ts";
 import { githubCopilotProvider } from "./github-copilot.ts";
 import { googleProvider } from "./google.ts";
 import { googleVertexProvider } from "./google-vertex.ts";
+import { greenptProvider } from "./greenpt.ts";
 import { groqProvider } from "./groq.ts";
 import { huggingfaceProvider } from "./huggingface.ts";
 import { kimiCodingProvider } from "./kimi-coding.ts";
+import { llamaCppServerProvider, lmStudioProvider, ollamaProvider, vllmProvider } from "./local.ts";
 import { minimaxProvider } from "./minimax.ts";
 import { minimaxCnProvider } from "./minimax-cn.ts";
 import { mistralProvider } from "./mistral.ts";
@@ -37,6 +39,7 @@ import { qwenTokenPlanIndividualProvider } from "./qwen-token-plan-individual.ts
 import { radiusProvider } from "./radius.ts";
 import { togetherProvider } from "./together.ts";
 import { vercelAIGatewayProvider } from "./vercel-ai-gateway.ts";
+import { viroProvider } from "./viro.ts";
 import { xaiProvider } from "./xai.ts";
 import { xiaomiProvider } from "./xiaomi.ts";
 import { xiaomiTokenPlanAmsProvider } from "./xiaomi-token-plan-ams.ts";
@@ -101,15 +104,19 @@ export function builtinProviders(): Provider[] {
 		githubCopilotProvider(),
 		googleProvider(),
 		googleVertexProvider(),
+		greenptProvider(),
 		groqProvider(),
 		huggingfaceProvider(),
 		kimiCodingProvider(),
+		llamaCppServerProvider(),
+		lmStudioProvider(),
 		minimaxProvider(),
 		minimaxCnProvider(),
 		mistralProvider(),
 		moonshotaiProvider(),
 		moonshotaiCnProvider(),
 		nvidiaProvider(),
+		ollamaProvider(),
 		openaiProvider(),
 		openaiCodexProvider(),
 		opencodeProvider(),
@@ -121,6 +128,8 @@ export function builtinProviders(): Provider[] {
 		radiusProvider(),
 		togetherProvider(),
 		vercelAIGatewayProvider(),
+		viroProvider(),
+		vllmProvider(),
 		xaiProvider(),
 		xiaomiProvider(),
 		xiaomiTokenPlanAmsProvider(),

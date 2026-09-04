@@ -9,6 +9,7 @@ import { main } from "../src/main.ts";
 
 async function createRuntime(credentials: AuthStorage): Promise<ModelRuntime> {
 	return ModelRuntime.create({
+		allBuiltinProviders: true,
 		credentials,
 		modelsPath: null,
 		modelsStore: new InMemoryModelsStore(),

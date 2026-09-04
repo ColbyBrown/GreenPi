@@ -53,7 +53,12 @@ async function runtimeWithProvider(
 	registered: Provider,
 	credentials: AuthStorage = AuthStorage.inMemory(),
 ): Promise<ModelRuntime> {
-	const runtime = await ModelRuntime.create({ credentials, modelsPath: null, allowModelNetwork: false });
+	const runtime = await ModelRuntime.create({
+		allBuiltinProviders: true,
+		credentials,
+		modelsPath: null,
+		allowModelNetwork: false,
+	});
 	runtime.registerNativeProvider(registered);
 	await runtime.refresh({ allowNetwork: false, providers: [registered.id] });
 	return runtime;
@@ -121,7 +126,11 @@ describe("ModelRuntime credential synchronization", () => {
 		const blocked = new Promise<void>((resolve) => {
 			finish = resolve;
 		});
-		const runtime = await ModelRuntime.create({ credentials: AuthStorage.inMemory(), modelsPath: null });
+		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
+			credentials: AuthStorage.inMemory(),
+			modelsPath: null,
+		});
 		runtime.registerNativeProvider(
 			provider("one", {
 				login: async () => {
@@ -151,7 +160,11 @@ describe("ModelRuntime credential synchronization", () => {
 
 	it("does not wait for unrelated provider availability during local synchronization", async () => {
 		let stallUnrelated = false;
-		const runtime = await ModelRuntime.create({ credentials: AuthStorage.inMemory(), modelsPath: null });
+		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
+			credentials: AuthStorage.inMemory(),
+			modelsPath: null,
+		});
 		runtime.registerNativeProvider(provider("target"));
 		const unrelated = provider("unrelated");
 		if (unrelated.auth.apiKey) {
@@ -227,7 +240,11 @@ describe("ModelRuntime credential synchronization", () => {
 		const blocked = new Promise<void>((resolve) => {
 			finish = resolve;
 		});
-		const runtime = await ModelRuntime.create({ credentials: AuthStorage.inMemory(), modelsPath: null });
+		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
+			credentials: AuthStorage.inMemory(),
+			modelsPath: null,
+		});
 		runtime.registerNativeProvider(
 			provider("one", {
 				refreshModels: async (context) => {
@@ -276,7 +293,7 @@ describe("ModelRuntime credential synchronization", () => {
 				stored = undefined;
 			},
 		};
-		const runtime = await ModelRuntime.create({ credentials, modelsPath: null });
+		const runtime = await ModelRuntime.create({ allBuiltinProviders: true, credentials, modelsPath: null });
 		runtime.registerNativeProvider(provider("delayed-commit"));
 		await runtime.refresh({ allowNetwork: false, providers: ["delayed-commit"] });
 		const controller = new AbortController();

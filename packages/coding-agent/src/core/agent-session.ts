@@ -47,9 +47,9 @@ import {
 	resetApiProviders,
 	streamSimple,
 } from "@earendil-works/pi-ai/compat";
+import { sleep } from "@earendil-works/pi-ai/utils/sleep";
 import { getThemeByName, theme } from "../modes/interactive/theme/theme.ts";
 import { stripFrontmatter } from "../utils/frontmatter.ts";
-import { sleep } from "../utils/sleep.ts";
 import { normalizeToolResultImages } from "../utils/tool-result-images.ts";
 import { formatNoApiKeyFoundMessage, formatNoModelSelectedMessage } from "./auth-guidance.ts";
 import { type BashResult, executeBashWithOperations } from "./bash-executor.ts";

@@ -69,5 +69,8 @@ export async function createAuthCheckModelRuntime(credentials: CredentialStore):
 		modelsStore: new InMemoryCodingAgentModelsStore(),
 		allowModelNetwork: false,
 		refreshOnCreate: false,
+		// Credential checks must see every built-in provider, not just the
+		// presented defaults.
+		allBuiltinProviders: true,
 	});
 }

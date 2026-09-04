@@ -63,6 +63,19 @@ interface ModelRuntimeSnapshot {
 	auth: ReadonlyMap<string, AuthCheck | undefined>;
 }
 
+/**
+ * Providers presented out of the box. Everything else in the built-in catalog
+ * is still available to SDK consumers and via models.json custom providers.
+ */
+export const DEFAULT_PRESENTED_PROVIDERS: ReadonlySet<string> = new Set([
+	"greenpt",
+	"viro",
+	"lmstudio",
+	"ollama",
+	"vllm",
+	"llama-cpp",
+]);
+
 export interface CreateModelRuntimeOptions {
 	/** Credential storage. Defaults to the file at authPath. */
 	credentials?: CredentialStore;
@@ -79,6 +92,8 @@ export interface CreateModelRuntimeOptions {
 	signal?: AbortSignal;
 	/** Skip initial catalog and availability refresh. Static models remain available. */
 	refreshOnCreate?: boolean;
+	/** Register every built-in provider instead of only DEFAULT_PRESENTED_PROVIDERS. */
+	allBuiltinProviders?: boolean;
 }
 
 export interface ModelRuntimeAuthOverrides extends AuthOperationOptions {
@@ -182,8 +197,11 @@ export class ModelRuntime implements Models {
 		const builtinModelDataGeneratedAt = builtinProviderCatalog.getBuiltinModelDataGeneratedAt();
 		const providers = builtinProviderCatalog
 			.builtinProviders()
+			.filter((provider) => options.allBuiltinProviders || DEFAULT_PRESENTED_PROVIDERS.has(provider.id))
 			.map((provider) =>
-				provider.id === "radius"
+				// Providers with their own refresh logic (dynamic catalogs) must not be
+				// wrapped: withRemoteCatalog would replace their refreshModels.
+				provider.refreshModels
 					? provider
 					: withRemoteCatalog(provider, options.catalogBaseUrl, builtinModelDataGeneratedAt),
 			);

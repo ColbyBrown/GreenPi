@@ -16,8 +16,9 @@ import { isValidThinkingLevel } from "../cli/args.ts";
 import { DEFAULT_THINKING_LEVEL } from "./defaults.ts";
 import type { ModelRuntime } from "./model-runtime.ts";
 
-/** Default model IDs for each known provider */
-export const defaultModelPerProvider: Record<KnownProvider, string> = {
+/** Default model IDs for each known provider; omitted entries fall back to the
+ * provider's first available model. */
+export const defaultModelPerProvider: Partial<Record<KnownProvider, string>> = {
 	"amazon-bedrock": "us.anthropic.claude-opus-4-6-v1",
 	"ant-ling": "Ring-2.6-1T",
 	anthropic: "claude-opus-4-8",
@@ -58,6 +59,7 @@ export const defaultModelPerProvider: Record<KnownProvider, string> = {
 	"xiaomi-token-plan-cn": "mimo-v2.5-pro",
 	"xiaomi-token-plan-ams": "mimo-v2.5-pro",
 	"xiaomi-token-plan-sgp": "mimo-v2.5-pro",
+	greenpt: "glm-5.2",
 };
 
 export interface ScopedModel {

@@ -32,6 +32,7 @@ import { AssistantMessageEventStream } from "../utils/event-stream.ts";
 import { headersToRecord } from "../utils/headers.ts";
 import { resolveHttpProxyUrlForTarget } from "../utils/node-http-proxy.ts";
 import { getPiUserAgent } from "../utils/pi-user-agent.ts";
+import { sleep } from "../utils/sleep.ts";
 import { uuidv7 } from "../utils/uuid.ts";
 import { createGrammarToolInputProperties } from "./constrained-sampling.ts";
 import { clampOpenAIPromptCacheKey } from "./openai-prompt-cache.ts";
@@ -166,20 +167,6 @@ function validateRetryDelayMs(delayMs: number, options?: StreamOptions): number 
 		);
 	}
 	return delayMs;
-}
-
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-	return new Promise((resolve, reject) => {
-		if (signal?.aborted) {
-			reject(new Error("Request was aborted"));
-			return;
-		}
-		const timeout = setTimeout(resolve, ms);
-		signal?.addEventListener("abort", () => {
-			clearTimeout(timeout);
-			reject(new Error("Request was aborted"));
-		});
-	});
 }
 
 function normalizeTimeoutMs(value: number | undefined): number | undefined {

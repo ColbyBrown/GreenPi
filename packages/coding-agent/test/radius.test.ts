@@ -51,6 +51,7 @@ afterEach(() => {
 describe("Radius provider", () => {
 	it("restores the legacy credential catalog without network access", async () => {
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: AuthStorage.inMemory({
 				[RADIUS_PROVIDER_ID]: radiusOAuthCredential("https://radius.example.com/v1"),
 			}),
@@ -83,6 +84,7 @@ describe("Radius provider", () => {
 			},
 		});
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials,
 			modelsStore,
 			modelsPath: null,
@@ -100,6 +102,7 @@ describe("Radius provider", () => {
 	it("does not refresh catalogs over the network by default", async () => {
 		const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("unexpected catalog fetch"));
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: AuthStorage.inMemory({
 				[RADIUS_PROVIDER_ID]: radiusOAuthCredential("https://radius.example.com/v1"),
 			}),
@@ -114,6 +117,7 @@ describe("Radius provider", () => {
 	it("does not fetch or expose Radius models without configured auth", async () => {
 		const fetchSpy = vi.spyOn(globalThis, "fetch");
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: AuthStorage.inMemory(),
 			modelsStore: new InMemoryModelsStore(),
 			modelsPath: null,
@@ -136,6 +140,7 @@ describe("Radius provider", () => {
 			}),
 		);
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: AuthStorage.inMemory({
 				"radius-dev": {
 					type: "oauth",
@@ -160,6 +165,7 @@ describe("Radius provider", () => {
 		const modelsPath = join(tempDir, "models.json");
 		writeFileSync(modelsPath, JSON.stringify({ providers: { "radius-dev": { oauth: "radius" } } }));
 		const runtime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: AuthStorage.inMemory(),
 			modelsStore: new InMemoryModelsStore(),
 			modelsPath,

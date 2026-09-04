@@ -45,6 +45,7 @@ describe("AgentSessionRuntime session lifecycle events", () => {
 		const authStorage = AuthStorage.inMemory();
 		await authStorage.modify(faux.getModel().provider, async () => ({ type: "api_key", key: "faux-key" }));
 		const modelRuntime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: authStorage,
 			modelsPath: join(tempDir, "models.json"),
 		});

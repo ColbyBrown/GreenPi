@@ -56,6 +56,7 @@ describe("AgentSession dynamic provider registration", () => {
 		const authStorage = AuthStorage.create(join(agentDir, "auth.json"));
 		await authStorage.modify("anthropic", async () => ({ type: "api_key", key: "test-key" }));
 		const modelRuntime = await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials: authStorage,
 			modelsPath: join(agentDir, "models.json"),
 		});

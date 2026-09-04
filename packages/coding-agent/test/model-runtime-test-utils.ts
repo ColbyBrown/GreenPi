@@ -15,6 +15,7 @@ function wrap(runtime: ModelRuntime): ModelRegistry {
 export async function createModelRegistry(credentials: CredentialStore, modelsPath?: string): Promise<ModelRegistry> {
 	return wrap(
 		await ModelRuntime.create({
+			allBuiltinProviders: true,
 			credentials,
 			modelsPath,
 			modelsStore: new InMemoryCodingAgentModelsStore(),
@@ -24,7 +25,9 @@ export async function createModelRegistry(credentials: CredentialStore, modelsPa
 }
 
 export async function createInMemoryModelRegistry(credentials: CredentialStore): Promise<ModelRegistry> {
-	return wrap(await ModelRuntime.create({ credentials, modelsPath: null, allowModelNetwork: false }));
+	return wrap(
+		await ModelRuntime.create({ allBuiltinProviders: true, credentials, modelsPath: null, allowModelNetwork: false }),
+	);
 }
 
 export function getModelRuntime(modelRegistry: ModelRegistry): ModelRuntime {

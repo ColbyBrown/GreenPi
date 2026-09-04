@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `sleep()` now accepts an optional `AbortSignal`; removed duplicate local sleep helpers from `openai-codex-responses.ts` and downstream packages.
+
+### Added
+
+- Added GreenPT (OpenAI-compatible, curated catalog) and Viro AI (dynamic catalog from `https://ai.viro.app/api`) providers.
+- Added local inference providers for LM Studio, Ollama, vLLM, and llama.cpp server with dynamic model discovery from their OpenAI-compatible `/models` endpoints; no API key required (optional `LMSTUDIO_API_KEY`, `OLLAMA_API_KEY`, `VLLM_API_KEY`, `LLAMA_CPP_API_KEY` env vars).
+
+### Changed
+
+- pi now presents only the default providers (GreenPT, Viro AI, LM Studio, Ollama, vLLM, llama.cpp server); other built-in cloud providers are no longer registered by the default runtime and must be declared via `models.json` or enabled with `ModelRuntime.create({ allBuiltinProviders: true })`.
+
 ## [0.85.0] - 2026-09-04
 
 ### Breaking Changes
