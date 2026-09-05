@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added tool-result pruning before compaction: oversized tool outputs (>8192 chars) are truncated to bounded head + omission marker + tail in summarized history and the agent harness retained tail, keeping summary calls and post-compaction context bounded without touching the session log.
+
 ## [0.85.0] - 2026-09-04
 
 ### Fixed

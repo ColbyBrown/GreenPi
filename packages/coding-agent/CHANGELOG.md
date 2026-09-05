@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Compaction summaries are now generated from pruned history: oversized tool-result text blocks (>8192 chars) are truncated to head + omission marker + tail before serialization. Original outputs remain in the session log.
+
 ### Removed
 
 - Removed unused `src/client/index.ts` re-export barrel and `src/utils/deprecation.ts` (no callers).

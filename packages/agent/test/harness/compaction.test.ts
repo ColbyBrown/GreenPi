@@ -8,6 +8,8 @@ import {
 	type Message,
 	type Model,
 	type Models,
+	type TextContent,
+	type ToolResultMessage,
 	type Usage,
 } from "@earendil-works/pi-ai";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -25,6 +27,7 @@ import {
 	generateSummaryWithUsage,
 	getLastAssistantUsage,
 	prepareCompaction,
+	pruneToolResultMessages,
 	serializeConversation,
 	shouldCompact,
 } from "../../src/harness/compaction/compaction.ts";
@@ -819,6 +822,53 @@ describe("harness compaction", () => {
 		expect(result.usage?.totalTokens).toBeGreaterThan(0);
 		expect(result.retainedTail?.length).toBeGreaterThan(0);
 		expect(result.details).toBeDefined();
+	});
+	describe("pruneToolResultMessages", () => {
+		function toolResult(text: string): AgentMessage {
+			return {
+				role: "toolResult",
+				toolCallId: "call-1",
+				toolName: "bash",
+				content: [{ type: "text", text }],
+				isError: false,
+				timestamp: Date.now(),
+			};
+		}
+
+		it("truncates oversized tool results to head + marker + tail", () => {
+			const long = "a".repeat(20000);
+			const pruned = pruneToolResultMessages([toolResult(long)])[0] as ToolResultMessage;
+			const text = (pruned.content[0] as TextContent).text;
+			expect(text.startsWith("a".repeat(4000))).toBe(true);
+			expect(text.endsWith("a".repeat(2000))).toBe(true);
+			expect(text).toContain("[... 14000 characters truncated ...]");
+			expect(text.length).toBeLessThan(7000);
+		});
+
+		it("leaves small tool results and non-toolResult messages untouched", () => {
+			const small = toolResult("short output");
+			const user: AgentMessage = { role: "user", content: "x".repeat(20000), timestamp: Date.now() };
+			const [prunedSmall, prunedUser] = pruneToolResultMessages([small, user]);
+			expect(prunedSmall).toBe(small);
+			expect(prunedUser).toBe(user);
+		});
+
+		it("keeps images and prunes only oversized text blocks", () => {
+			const msg: AgentMessage = {
+				role: "toolResult",
+				toolCallId: "call-1",
+				toolName: "read",
+				content: [
+					{ type: "text", text: "b".repeat(10000) },
+					{ type: "image", mimeType: "image/png", data: "abc" },
+				],
+				isError: false,
+				timestamp: Date.now(),
+			};
+			const pruned = pruneToolResultMessages([msg])[0] as ToolResultMessage;
+			expect((pruned.content[0] as TextContent).text).toContain("characters truncated");
+			expect(pruned.content[1]).toEqual({ type: "image", mimeType: "image/png", data: "abc" });
+		});
 	});
 });
 

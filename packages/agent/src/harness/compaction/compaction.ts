@@ -9,6 +9,7 @@ import {
 	type RetryPolicy,
 	retryAssistantCall,
 	type SimpleStreamOptions,
+	type ToolResultMessage,
 	type Usage,
 	uuidv7,
 } from "@earendil-works/pi-ai";
@@ -240,6 +241,36 @@ export function estimateContextTokens(messages: AgentMessage[]): ContextUsageEst
 		trailingTokens,
 		lastUsageIndex: usageInfo.index,
 	};
+}
+
+// Tool-result pruning: before summarization, oversized tool outputs are
+// mechanically truncated to bounded head + omission marker + tail so the
+// summary call sees a bounded conversation. The full output stays in the
+// session log; only the summarized/retained copies are truncated.
+const PRUNE_THRESHOLD_CHARS = 8192;
+const PRUNE_HEAD_CHARS = 4000;
+const PRUNE_TAIL_CHARS = 2000;
+
+function pruneText(text: string): string {
+	if (text.length <= PRUNE_THRESHOLD_CHARS) return text;
+	const omitted = text.length - PRUNE_HEAD_CHARS - PRUNE_TAIL_CHARS;
+	return `${text.slice(0, PRUNE_HEAD_CHARS)}\n[... ${omitted} characters truncated ...]\n${text.slice(text.length - PRUNE_TAIL_CHARS)}`;
+}
+
+/** Return messages with oversized toolResult text blocks truncated for summarization. */
+export function pruneToolResultMessages<T extends AgentMessage>(messages: T[]): T[] {
+	return messages.map((message) => {
+		if (message.role !== "toolResult") return message;
+		let changed = false;
+		const content = (message as ToolResultMessage).content.map((block) => {
+			if (block.type !== "text") return block;
+			const pruned = pruneText(block.text);
+			if (pruned === block.text) return block;
+			changed = true;
+			return { ...block, text: pruned };
+		});
+		return changed ? { ...message, content } : message;
+	});
 }
 
 /** Return whether context usage exceeds the configured compaction threshold. */
@@ -567,7 +598,7 @@ export async function generateSummaryWithRequest(
 	if (customInstructions) {
 		basePrompt = `${basePrompt}\n\nAdditional focus: ${customInstructions}`;
 	}
-	const llmMessages = convertToLlm(currentMessages);
+	const llmMessages = convertToLlm(pruneToolResultMessages(currentMessages));
 	const conversationText = serializeConversation(llmMessages);
 	let promptText = `<conversation>\n${conversationText}\n</conversation>\n\n`;
 	if (previousSummary) {
@@ -812,7 +843,13 @@ export async function compactWithRequest(
 	summary += formatFileOperations(readFiles, modifiedFiles);
 	const details: CompactionDetails = { readFiles, modifiedFiles };
 
-	return ok({ summary, tokensBefore, usage: summaryUsage, retainedTail, details });
+	return ok({
+		summary,
+		tokensBefore,
+		usage: summaryUsage,
+		retainedTail: pruneToolResultMessages(retainedTail),
+		details,
+	});
 }
 async function generateTurnPrefixSummary(
 	messages: AgentMessage[],
@@ -826,7 +863,7 @@ async function generateTurnPrefixSummary(
 		Math.floor(0.5 * reserveTokens),
 		model.maxTokens > 0 ? model.maxTokens : Number.POSITIVE_INFINITY,
 	);
-	const llmMessages = convertToLlm(messages);
+	const llmMessages = convertToLlm(pruneToolResultMessages(messages));
 	const conversationText = serializeConversation(llmMessages);
 	const promptText = `<conversation>\n${conversationText}\n</conversation>\n\n${TURN_PREFIX_SUMMARIZATION_PROMPT}`;
 	const summarizationMessages = [

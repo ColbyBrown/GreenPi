@@ -67,6 +67,7 @@ export {
 	generateSummaryWithUsage,
 	getLastAssistantUsage,
 	prepareCompaction,
+	pruneToolResultMessages,
 	serializeConversation,
 	shouldCompact,
 } from "./harness/compaction/compaction.ts";
