@@ -10,13 +10,15 @@
 
 > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-# Pi Agent Harness
+# Pi Agent Harness (local-first fork)
 
 This is the home of the Pi agent harness project including our self extensible coding agent.
 
+This fork is **local-first**: your code, sessions, and model traffic stay on your machine by default. Cloud LLM providers are limited to **[GreenPT](https://greenpt.com)** and **[Viro AI](https://ai.viro.app)**; all other built-in cloud providers (OpenAI, Anthropic, Google, etc.) are no longer registered by the default runtime. Use local inference instead — LM Studio, Ollama, vLLM, or the llama.cpp router server (`/login llama.cpp`, `/llama`) — or declare other cloud endpoints via `models.json` if you must.
+
 * **[@earendil-works/pi-coding-agent](packages/coding-agent)**: Interactive coding agent CLI
 * **[@earendil-works/pi-agent-core](packages/agent)**: Agent runtime with tool calling and state management
-* **[@earendil-works/pi-ai](packages/ai)**: Unified multi-provider LLM API (OpenAI, Anthropic, Google, …)
+* **[@earendil-works/pi-ai](packages/ai)**: Unified multi-provider LLM API, local-first (GreenPT, Viro AI, and local OpenAI-compatible servers)
 
 To learn more about Pi:
 
@@ -29,7 +31,7 @@ To learn more about Pi:
 |---------|-------------|
 | **[@earendil-works/chord](packages/chord)** | Standalone application-composition runtime for services, replicated state, RPC, and plugins |
 | **[@earendil-works/pi-telemetry](packages/telemetry)** | Vendor-neutral telemetry contracts, reference adapter, conformance tests, and typed schemas |
-| **[@earendil-works/pi-ai](packages/ai)** | Unified multi-provider LLM API (OpenAI, Anthropic, Google, etc.) |
+| **[@earendil-works/pi-ai](packages/ai)** | Unified multi-provider LLM API, local-first (GreenPT, Viro AI, and local OpenAI-compatible servers) |
 | **[@earendil-works/pi-agent-core](packages/agent)** | Agent runtime with tool calling and state management |
 | **[@earendil-works/pi-coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
 | **[@earendil-works/pi-tui](packages/tui)** | Terminal UI library with differential rendering |

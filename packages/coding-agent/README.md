@@ -77,11 +77,13 @@ curl -fsSL https://pi.dev/install.sh | sh
 Authenticate with an API key:
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+export GREENPT_API_KEY=...
 pi
 ```
 
-Or use your existing subscription:
+Or run a local server (LM Studio, Ollama, vLLM, llama.cpp) and just start `pi` — it auto-discovers models on the default ports.
+
+Or select a provider interactively:
 
 ```bash
 pi
@@ -96,49 +98,23 @@ Then just talk to pi. By default, pi gives the model four tools: `read`, `write`
 
 ## Providers & Models
 
-For each built-in provider, pi maintains a list of tool-capable models. Configured provider catalogs refresh automatically; run `pi update --models` to force an immediate refresh. Authenticate via subscription (`/login`) or API key, then select any model from that provider via `/model` (or Ctrl+L). Press Ctrl+S in the model picker to save the highlighted model as the startup default.
+For each provider, pi maintains a list of tool-capable models. Configured provider catalogs refresh automatically; run `pi update --models` to force an immediate refresh. Configure a provider (`/login`) or set its API key, then select any model from that provider via `/model` (or Ctrl+L). Press Ctrl+S in the model picker to save the highlighted model as the startup default.
 
-**Subscriptions:**
-- Anthropic Claude Pro/Max
-- OpenAI ChatGPT Plus/Pro (Codex)
-- GitHub Copilot
+This fork is **local-first**. By default, pi presents only these providers:
 
-**API keys:**
-- Anthropic
-- Ant Ling
-- OpenAI
-- Azure OpenAI
-- DeepSeek
-- NVIDIA NIM
-- Google Gemini
-- Google Vertex
-- Amazon Bedrock
-- Mistral
-- Groq
-- Cerebras
-- Cloudflare AI Gateway
-- Cloudflare Workers AI
-- xAI
-- OpenRouter
-- Vercel AI Gateway
-- ZAI Coding Plan (Global)
-- ZAI Coding Plan (China)
-- OpenCode Zen
-- OpenCode Go
-- Hugging Face
-- Fireworks
-- Together AI
-- Baseten
-- Kimi For Coding
-- MiniMax
-- Xiaomi MiMo
-- Xiaomi MiMo Token Plan (China)
-- Xiaomi MiMo Token Plan (Amsterdam)
-- Xiaomi MiMo Token Plan (Singapore)
+**Local inference (recommended):**
+- LM Studio
+- Ollama
+- vLLM
+- llama.cpp server — configure with `/login llama.cpp`, manage downloads and loaded models with `/llama`, then select a loaded model with `/model`. See [docs/llama-cpp.md](docs/llama-cpp.md)
 
-Pi also supports the llama.cpp router server. Configure it with `/login llama.cpp`, manage downloads and loaded models with `/llama`, then select a loaded model with `/model`. See [docs/llama-cpp.md](docs/llama-cpp.md) for setup and usage.
+**Cloud (API keys):**
+- GreenPT
+- Viro AI
 
-See [docs/providers.md](docs/providers.md) for other provider setup instructions.
+Other built-in cloud providers (OpenAI, Anthropic, Google, etc.) are not registered by the default runtime. To use one, declare it via `~/.pi/agent/models.json`, or enable every built-in provider programmatically with `ModelRuntime.create({ allBuiltinProviders: true })`.
+
+See [docs/providers.md](docs/providers.md) for provider setup instructions.
 
 **Custom providers & models:** Add providers via `~/.pi/agent/models.json` if they speak a supported API (OpenAI, Anthropic, Google). For custom APIs or OAuth, use extensions. See [docs/models.md](docs/models.md) and [docs/custom-provider.md](docs/custom-provider.md).
 
@@ -557,7 +533,7 @@ cat README.md | pi -p "Summarize this text"
 
 | Option | Description |
 |--------|-------------|
-| `--provider <name>` | Provider (anthropic, openai, google, etc.) |
+| `--provider <name>` | Provider (greenpt, viro, lmstudio, ollama, vllm, llama-cpp, etc.) |
 | `--model <pattern>` | Model pattern or ID (supports `provider/id` and optional `:<thinking>`) |
 | `--api-key <key>` | API key (overrides env vars) |
 | `--thinking <level>` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max` |
@@ -647,16 +623,16 @@ cat README.md | pi -p "Summarize this text"
 pi --name "release audit" -p "Audit this repository"
 
 # Different model
-pi --provider openai --model gpt-4o "Help me refactor"
+pi --provider greenpt --model glm-5.2 "Help me refactor"
 
 # Model with provider prefix (no --provider needed)
-pi --model openai/gpt-4o "Help me refactor"
+pi --model viro/kimi-k2.6 "Help me refactor"
 
 # Model with thinking level shorthand
-pi --model sonnet:high "Solve this complex problem"
+pi --model glm-5.2:high "Solve this complex problem"
 
 # Limit model cycling
-pi --models "claude-*,gpt-4o"
+pi --models "glm-*,kimi-*"
 
 # Read-only mode
 pi --tools read,grep,find,ls -p "Review the code"

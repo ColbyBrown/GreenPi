@@ -6,8 +6,7 @@ Pi ships with a default set of providers focused on European cloud inference and
 
 - [Default Providers](#default-providers)
 - [Other Built-in Providers](#other-built-in-providers)
-- [API Keys](#api-keys)
-- [Cloud Providers](#cloud-providers)
+- [API Keys and Auth File](#api-keys-and-auth-file)
 - [llama.cpp](#llamacpp)
 - [Custom Providers](#custom-providers)
 - [Resolution Order](#resolution-order)
@@ -57,111 +56,47 @@ Discovered models assume a 128k context window and 8k output; override per model
 
 ## Other Built-in Providers
 
-The provider catalog also contains cloud API-key and subscription providers (Anthropic, OpenAI, Google, Amazon Bedrock, Groq, xAI, OpenRouter, and many more — see the [API Keys](#api-keys) table below for the full list). They are not registered by pi's default runtime, but remain available:
+The provider catalog also contains cloud API-key and subscription providers (Anthropic, OpenAI, Google, Amazon Bedrock, Groq, xAI, OpenRouter, and many more). They are not registered by pi's default runtime, but remain available:
 
-- **Via `models.json`:** declare the provider as a custom provider with its `baseUrl` and API (see [models.md](models.md)).
+- **Via `models.json`:** declare the provider as a custom provider with its `baseUrl` and API (see [models.md](models.md)). Environment variables and `auth.json` keys are listed in [`packages/ai/src/env-api-keys.ts`](../../ai/src/env-api-keys.ts).
 - **Via the SDK:** `ModelRuntime.create({ allBuiltinProviders: true })` registers the full catalog.
 
 Subscription OAuth providers (ChatGPT/Codex, Claude Pro/Max, GitHub Copilot, xAI, OpenRouter, Radius) are not offered by `/login` in the default runtime.
 
-The sections below document these providers as catalog reference.
+## API Keys and Auth File
 
-## API Keys
-
-These providers are not registered by pi's default runtime (see [Other Built-in Providers](#other-built-in-providers)); the table documents their credentials for `models.json` and SDK usage.
-
-### Environment Variables or Auth File
-
-Use `/login` in interactive mode and select a provider to store an API key in `auth.json`, or set credentials via environment variable:
+API keys are resolved from the credential store (`~/.pi/agent/auth.json`) or environment variables. Store a key via `/login <provider>` or set the env var directly:
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-pi
+export GREENPT_API_KEY=...
+# or: export VIRO_API_KEY=...
 ```
 
 | Provider | Environment Variable | `auth.json` key |
 |----------|----------------------|------------------|
-| Anthropic | `ANTHROPIC_API_KEY` | `anthropic` |
-| Ant Ling | `ANT_LING_API_KEY` | `ant-ling` |
-| Azure OpenAI Responses | `AZURE_OPENAI_API_KEY` | `azure-openai-responses` |
-| OpenAI | `OPENAI_API_KEY` | `openai` |
-| DeepSeek | `DEEPSEEK_API_KEY` | `deepseek` |
-| NVIDIA NIM | `NVIDIA_API_KEY` | `nvidia` |
-| Google Gemini | `GEMINI_API_KEY` | `google` |
-| Amazon Bedrock | `AWS_BEARER_TOKEN_BEDROCK` | `amazon-bedrock` |
-| Mistral | `MISTRAL_API_KEY` | `mistral` |
-| Groq | `GROQ_API_KEY` | `groq` |
-| Cerebras | `CEREBRAS_API_KEY` | `cerebras` |
-| Cloudflare AI Gateway | `CLOUDFLARE_API_KEY` (+ `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_GATEWAY_ID`) | `cloudflare-ai-gateway` |
-| Cloudflare Workers AI | `CLOUDFLARE_API_KEY` (+ `CLOUDFLARE_ACCOUNT_ID`) | `cloudflare-workers-ai` |
-| xAI | `XAI_API_KEY` | `xai` |
-| OpenRouter | `OPENROUTER_API_KEY` | `openrouter` |
-| Vercel AI Gateway | `AI_GATEWAY_API_KEY` | `vercel-ai-gateway` |
-| ZAI Coding Plan (Global) | `ZAI_API_KEY` | `zai` |
-| ZAI Coding Plan (China) | `ZAI_CODING_CN_API_KEY` | `zai-coding-cn` |
-| OpenCode Zen | `OPENCODE_API_KEY` | `opencode` |
-| OpenCode Go | `OPENCODE_API_KEY` | `opencode-go` |
-| Radius | `RADIUS_API_KEY` | `radius` |
-| Hugging Face | `HF_TOKEN` | `huggingface` |
-| Fireworks | `FIREWORKS_API_KEY` | `fireworks` |
-| Together AI | `TOGETHER_API_KEY` | `together` |
-| Baseten | `BASETEN_API_KEY` | `baseten` |
-| Kimi For Coding | `KIMI_API_KEY` | `kimi-coding` |
-| MiniMax | `MINIMAX_API_KEY` | `minimax` |
-| MiniMax (China) | `MINIMAX_CN_API_KEY` | `minimax-cn` |
-| Qwen Token Plan (existing catalog) | `QWEN_TOKEN_PLAN_API_KEY` | `qwen-token-plan` |
-| Qwen Token Plan (Individual) | `QWEN_TOKEN_PLAN_API_KEY` | `qwen-token-plan-individual` |
-| Qwen Token Plan (China) | `QWEN_TOKEN_PLAN_CN_API_KEY` | `qwen-token-plan-cn` |
-| Xiaomi MiMo | `XIAOMI_API_KEY` | `xiaomi` |
-| Xiaomi MiMo Token Plan (China) | `XIAOMI_TOKEN_PLAN_CN_API_KEY` | `xiaomi-token-plan-cn` |
-| Xiaomi MiMo Token Plan (Amsterdam) | `XIAOMI_TOKEN_PLAN_AMS_API_KEY` | `xiaomi-token-plan-ams` |
-| Xiaomi MiMo Token Plan (Singapore) | `XIAOMI_TOKEN_PLAN_SGP_API_KEY` | `xiaomi-token-plan-sgp` |
-
-Reference for environment variables and `auth.json` keys: [`const envMap`](https://github.com/earendil-works/pi-mono/blob/main/packages/ai/src/env-api-keys.ts) in [`packages/ai/src/env-api-keys.ts`](https://github.com/earendil-works/pi-mono/blob/main/packages/ai/src/env-api-keys.ts).
-
-#### Auth File
+| GreenPT | `GREENPT_API_KEY` | `greenpt` |
+| Viro AI | `VIRO_API_KEY` | `viro` |
 
 Store credentials in `~/.pi/agent/auth.json`:
 
 ```json
 {
-  "anthropic": { "type": "api_key", "key": "sk-ant-..." },
-  "ant-ling": { "type": "api_key", "key": "..." },
-  "openai": { "type": "api_key", "key": "sk-..." },
-  "deepseek": { "type": "api_key", "key": "sk-..." },
-  "nvidia": { "type": "api_key", "key": "nvapi-..." },
-  "google": { "type": "api_key", "key": "..." },
-  "opencode": { "type": "api_key", "key": "..." },
-  "opencode-go": { "type": "api_key", "key": "..." },
-  "together": { "type": "api_key", "key": "..." },
-  "qwen-token-plan":  { "type": "api_key", "key": "sk-sp-..." },
-  "qwen-token-plan-individual": { "type": "api_key", "key": "sk-sp-..." },
-  "qwen-token-plan-cn": { "type": "api_key", "key": "sk-sp-..." },
-  "xiaomi": { "type": "api_key", "key": "..." },
-  "xiaomi-token-plan-cn":  { "type": "api_key", "key": "..." },
-  "xiaomi-token-plan-ams": { "type": "api_key", "key": "..." },
-  "xiaomi-token-plan-sgp": { "type": "api_key", "key": "..." }
+  "greenpt": { "type": "api_key", "key": "..." },
+  "viro": { "type": "api_key", "key": "..." }
 }
 ```
 
-`qwen-token-plan-individual` uses the same international endpoint and `QWEN_TOKEN_PLAN_API_KEY` as
-`qwen-token-plan`, but limits the picker to the models documented for Individual subscriptions. The existing
-provider keeps its broader catalog for backward compatibility. When using `auth.json`, store the
-credential under the provider you select; an environment variable is shared by both international providers.
-
 The file is created with `0600` permissions (user read/write only). Auth file credentials take priority over environment variables.
 
-API key credentials can also include provider-scoped environment values. These values are used before process environment variables when resolving the credential key, provider/model headers, and provider configuration such as Cloudflare account IDs, Azure OpenAI settings, Vertex project/location, Bedrock settings, `PI_CACHE_RETENTION`, and `HTTP_PROXY`/`HTTPS_PROXY`.
+API key credentials can also include provider-scoped environment values. These values are used before process environment variables when resolving the credential key, provider/model headers, and provider configuration such as `PI_CACHE_RETENTION` and `HTTP_PROXY`/`HTTPS_PROXY`.
 
 ```json
 {
-  "cloudflare-ai-gateway": {
+  "greenpt": {
     "type": "api_key",
-    "key": "$CLOUDFLARE_API_KEY",
+    "key": "$GREENPT_API_KEY",
     "env": {
-      "CLOUDFLARE_API_KEY": "...",
-      "CLOUDFLARE_ACCOUNT_ID": "account-id",
-      "CLOUDFLARE_GATEWAY_ID": "gateway-id"
+      "GREENPT_API_KEY": "..."
     }
   }
 }
@@ -175,12 +110,11 @@ The `key` field supports command execution, environment interpolation, and liter
 
 - **Shell command:** `"!command"` at the start executes the whole value as a command and uses stdout (cached for process lifetime)
   ```json
-  { "type": "api_key", "key": "!security find-generic-password -ws 'anthropic'" }
-  { "type": "api_key", "key": "!op read 'op://vault/item/credential'" }
+  { "type": "api_key", "key": "!security find-generic-password -ws 'greenpt'" }
   ```
 - **Environment interpolation:** `"$ENV_VAR"` or `"${ENV_VAR}"` uses the value of the named variable. Interpolation works inside larger literals.
   ```json
-  { "type": "api_key", "key": "$MY_ANTHROPIC_KEY" }
+  { "type": "api_key", "key": "$MY_GREENPT_KEY" }
   { "type": "api_key", "key": "${KEY_PREFIX}_${KEY_SUFFIX}" }
   ```
   `$FOO_BAR` is the variable `FOO_BAR`; use `${FOO}_BAR` when `BAR` is literal text. Missing environment variables make the value unresolved.
@@ -191,122 +125,11 @@ The `key` field supports command execution, environment interpolation, and liter
   ```
 - **Literal value:** Used directly. Plain uppercase strings such as `MY_API_KEY` are literals; use `$MY_API_KEY` for environment variables.
   ```json
-  { "type": "api_key", "key": "sk-ant-..." }
+  { "type": "api_key", "key": "..." }
   { "type": "api_key", "key": "public" }
   ```
 
-OAuth credentials are also stored here after `/login` and managed automatically.
-
-## Cloud Providers
-
-### Azure OpenAI
-
-```bash
-export AZURE_OPENAI_API_KEY=...
-export AZURE_OPENAI_BASE_URL=https://your-resource.ai.azure.com
-# also supported: https://your-resource.cognitiveservices.azure.com
-# also supported: https://your-resource.openai.azure.com
-# root endpoints are auto-normalized to /openai/v1
-# or use resource name instead of base URL
-export AZURE_OPENAI_RESOURCE_NAME=your-resource
-
-# Optional
-export AZURE_OPENAI_API_VERSION=2024-02-01
-export AZURE_OPENAI_DEPLOYMENT_NAME_MAP=gpt-4=my-gpt4,gpt-4o=my-gpt4o
-```
-
-### Amazon Bedrock
-
-Use `/login amazon-bedrock` to store a Bedrock API key, or configure one of the ambient AWS credential sources below:
-
-```bash
-# Option 1: AWS Profile
-export AWS_PROFILE=your-profile
-
-# Option 2: IAM Keys
-export AWS_ACCESS_KEY_ID=AKIA...
-export AWS_SECRET_ACCESS_KEY=...
-
-# Option 3: Bearer Token
-export AWS_BEARER_TOKEN_BEDROCK=...
-
-# Optional region (defaults to us-east-1)
-export AWS_REGION=us-west-2
-```
-
-Also supports ECS task roles (`AWS_CONTAINER_CREDENTIALS_*`) and IRSA (`AWS_WEB_IDENTITY_TOKEN_FILE`).
-
-```bash
-pi --provider amazon-bedrock --model us.anthropic.claude-sonnet-4-20250514-v1:0
-```
-
-Prompt caching is enabled automatically for Claude models whose ID contains a recognizable model name (base models and system-defined inference profiles). For application inference profiles (whose ARNs don't contain the model name), set `AWS_BEDROCK_FORCE_CACHE=1` to enable cache points:
-
-```bash
-export AWS_BEDROCK_FORCE_CACHE=1
-pi --provider amazon-bedrock --model arn:aws:bedrock:us-east-1:123456789012:application-inference-profile/abc123
-```
-
-If you are connecting to a Bedrock API proxy, the following environment variables can be used:
-
-```bash
-# Set the URL for the Bedrock proxy (standard AWS SDK env var)
-export AWS_ENDPOINT_URL_BEDROCK_RUNTIME=https://my.corp.proxy/bedrock
-
-# Set if your proxy does not require authentication
-export AWS_BEDROCK_SKIP_AUTH=1
-
-# Set if your proxy only supports HTTP/1.1
-export AWS_BEDROCK_FORCE_HTTP1=1
-```
-
-### Cloudflare AI Gateway
-
-`CLOUDFLARE_API_KEY` can be set via `/login`. The account ID and gateway slug can be set as environment variables or in the API key credential's `env` object in `auth.json`.
-
-```bash
-export CLOUDFLARE_API_KEY=...           # or use /login
-export CLOUDFLARE_ACCOUNT_ID=...
-export CLOUDFLARE_GATEWAY_ID=...        # create at dash.cloudflare.com → AI → AI Gateway
-pi --provider cloudflare-ai-gateway --model "claude-sonnet-4-5"
-```
-
-Routes to OpenAI, Anthropic, and Workers AI through Cloudflare AI Gateway. Workers AI uses the Unified API (`/compat`) and prefixed model IDs (`workers-ai/@cf/...`). OpenAI uses the OpenAI passthrough route (`/openai`) with native OpenAI model IDs such as `gpt-5.1`. Anthropic uses the Anthropic passthrough route (`/anthropic`) with native Anthropic model IDs such as `claude-sonnet-4-5`.
-
-AI Gateway authentication uses `CLOUDFLARE_API_KEY` as `cf-aig-authorization`. Upstream authentication can be one of:
-
-| Mode | Request auth | Upstream auth |
-|------|--------------|---------------|
-| Workers AI | Cloudflare token only | Cloudflare-native |
-| Unified billing | Cloudflare token only | Cloudflare handles upstream auth and deducts credits |
-| Stored BYOK | Cloudflare token only | Cloudflare injects provider keys stored in the AI Gateway dashboard |
-| Inline BYOK | Cloudflare token plus upstream `Authorization` header | The request supplies the upstream provider key |
-
-For normal pi usage, prefer unified billing or stored BYOK. Inline BYOK requires configuring an additional upstream `Authorization` header for the Cloudflare AI Gateway provider, for example via a `models.json` provider/model override.
-
-### Cloudflare Workers AI
-
-`CLOUDFLARE_API_KEY` can be set via `/login`. `CLOUDFLARE_ACCOUNT_ID` can be set as an environment variable or in the API key credential's `env` object in `auth.json`.
-
-```bash
-export CLOUDFLARE_API_KEY=...           # or use /login
-export CLOUDFLARE_ACCOUNT_ID=...
-pi --provider cloudflare-workers-ai --model "@cf/moonshotai/kimi-k2.6"
-```
-
-Pi automatically sets `x-session-affinity` for [prefix caching](https://developers.cloudflare.com/workers-ai/features/prompt-caching/) discounts.
-
-### Google Vertex AI
-
-Uses Application Default Credentials:
-
-```bash
-gcloud auth application-default login
-export GOOGLE_CLOUD_PROJECT=your-project
-export GOOGLE_CLOUD_LOCATION=us-central1
-```
-
-Or set `GOOGLE_APPLICATION_CREDENTIALS` to a service account key file.
+OAuth credentials are stored here after `/login` for providers that use OAuth.
 
 ## llama.cpp
 
