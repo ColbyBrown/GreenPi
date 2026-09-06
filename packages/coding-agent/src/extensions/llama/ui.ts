@@ -21,8 +21,13 @@ import type { LlamaModelInfo, LlamaProgress } from "./client.ts";
 import type { HuggingFaceModel } from "./huggingface.ts";
 
 const DOWNLOAD_VALUE = "\0download";
+const STOP_SERVER_VALUE = "\0stop-server";
 
-export type LlamaManagerAction = { type: "model"; model: LlamaModelInfo } | { type: "download" } | { type: "close" };
+export type LlamaManagerAction =
+	| { type: "model"; model: LlamaModelInfo }
+	| { type: "download" }
+	| { type: "stop-server" }
+	| { type: "close" };
 
 interface ProgressState extends LlamaProgress {
 	title: string;
@@ -331,6 +336,7 @@ class LlamaView implements LlamaUi, Focusable {
 				description: modelDescription(model),
 			})),
 			{ value: DOWNLOAD_VALUE, label: "Download model…", description: "Hugging Face owner/repository[:quant]" },
+			{ value: STOP_SERVER_VALUE, label: "Stop server", description: "Shut down the managed llama-server" },
 		];
 		return new Promise((resolve) => {
 			const list = new SelectList(items, Math.min(items.length, 12), selectTheme(this.theme), {
@@ -339,6 +345,7 @@ class LlamaView implements LlamaUi, Focusable {
 			});
 			list.onSelect = (item) => {
 				if (item.value === DOWNLOAD_VALUE) resolve({ type: "download" });
+				else if (item.value === STOP_SERVER_VALUE) resolve({ type: "stop-server" });
 				else {
 					const model = byId.get(item.value);
 					if (model) resolve({ type: "model", model });

@@ -37,7 +37,9 @@ pi --provider viro
 
 ### Local Inference Servers
 
-LM Studio, Ollama, vLLM, and llama.cpp server run locally and need no API key (optional env vars are supported). Pi discovers their models from the OpenAI-compatible `GET /models` endpoint at startup.
+On first interactive startup, pi offers to set up llama.cpp as the default local provider: it installs a pinned `llama-server`, starts it on `http://127.0.0.1:8080` (`LLAMA_BASE_URL` overrides), downloads the default model, and saves it as the startup default. See [llama-cpp.md](llama-cpp.md).
+
+LM Studio, Ollama, vLLM, and a bring-your-own llama.cpp server run locally and need no API key (optional env vars are supported). Pi discovers their models from the OpenAI-compatible `GET /models` endpoint at startup.
 
 | Provider | Default endpoint | Optional key env var |
 |----------|------------------|----------------------|

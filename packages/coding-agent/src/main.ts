@@ -33,6 +33,7 @@ import type { ServerCommand } from "./cli/experimental/commands/server.ts";
 import { processFileArguments } from "./cli/file-processor.ts";
 import { buildInitialMessage } from "./cli/initial-message.ts";
 import { listModels } from "./cli/list-models.ts";
+import { maybeRunLlamaOnboarding } from "./cli/llama-onboarding.ts";
 import { createProjectTrustContext } from "./cli/project-trust.ts";
 import { selectSession } from "./cli/session-picker.ts";
 import { shouldRunFirstTimeSetup, showFirstTimeSetup, showStartupSelector } from "./cli/startup-ui.ts";
@@ -49,6 +50,7 @@ import { areExperimentalFeaturesEnabled } from "./core/experimental.ts";
 import { exportFromFile } from "./core/export-html/index.ts";
 import type { InlineExtension } from "./core/extensions/types.ts";
 import { applyHttpProxySettings, configureHttpDispatcher } from "./core/http-dispatcher.ts";
+import { ensureLlamaServer, llamaServerUrl } from "./core/llama-server.ts";
 import { resolveCliModel, resolveModelScope, type ScopedModel } from "./core/model-resolver.ts";
 import { ModelRuntime } from "./core/model-runtime.ts";
 import { restoreStdout, takeOverStdout } from "./core/output-guard.ts";
@@ -70,6 +72,7 @@ import { runClientTui } from "./experimental/client-tui.ts";
 import type { RadiusRelayHostStatus } from "./experimental/radius-relay.ts";
 import { startForegroundServer } from "./experimental/server.ts";
 import { builtInExtensions } from "./extensions/index.ts";
+import { LLAMA_PROVIDER_ID } from "./extensions/llama/provider.ts";
 import { runMigrations, showDeprecationWarnings } from "./migrations.ts";
 import { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.ts";
 import { initTheme, setThemeJsonValidator, stopThemeWatcher } from "./modes/interactive/theme/theme.ts";
@@ -109,6 +112,12 @@ function reportDiagnostics(diagnostics: readonly AgentSessionRuntimeDiagnostic[]
 		const prefix = diagnostic.type === "error" ? "Error: " : diagnostic.type === "warning" ? "Warning: " : "";
 		console.error(color(`${prefix}${diagnostic.message}`));
 	}
+}
+
+/** PI_LLAMA_AUTOSTART=0/false/no disables auto-starting the managed llama.cpp server. */
+function isLlamaAutostartDisabled(): boolean {
+	const value = process.env.PI_LLAMA_AUTOSTART?.toLowerCase();
+	return value === "0" || value === "false" || value === "no";
 }
 
 function isTruthyEnvFlag(value: string | undefined): boolean {
@@ -782,6 +791,12 @@ export async function main(args: string[], options?: MainOptions) {
 		time("firstTimeSetup");
 	}
 
+	// First-run provider onboarding: local llama.cpp setup or a cloud provider key.
+	if (appMode === "interactive" && !parsed.help && parsed.listModels === undefined) {
+		await maybeRunLlamaOnboarding(startupSettingsManager);
+		time("llamaOnboarding");
+	}
+
 	if (appMode === "interactive" && parsed.useTheme !== undefined) {
 		startupSettingsManager.applyOverrides({ theme: parsed.useTheme });
 	}
@@ -1054,6 +1069,16 @@ export async function main(args: string[], options?: MainOptions) {
 		printTimings();
 		await runRpcMode(runtime);
 	} else if (appMode === "interactive") {
+		if (session.model?.provider === LLAMA_PROVIDER_ID && !isLlamaAutostartDisabled()) {
+			try {
+				const state = await ensureLlamaServer();
+				if (state === "started") {
+					console.error(chalk.dim(`Started llama.cpp server at ${llamaServerUrl()}`));
+				}
+			} catch (error) {
+				console.error(chalk.yellow(`llama.cpp server: ${error instanceof Error ? error.message : String(error)}`));
+			}
+		}
 		const interactiveMode = new InteractiveMode(runtime, {
 			migratedProviders,
 			startupDiagnostics,

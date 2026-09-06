@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- First-run provider onboarding: interactive startup offers local llama.cpp (recommended), GreenPT, or Viro AI. Choosing llama.cpp installs a pinned `llama-server` build to `~/.pi/agent/llama/bin/`, starts it in router mode on port 8080 (`LLAMA_BASE_URL` overrides), downloads the default model `Colby/apertus-v1.5-8b-text-Q4_K_M-GGUF` from Hugging Face, loads it, and saves it as the startup default. Skippable; `PI_LLAMA_SETUP=0` disables, `PI_LLAMA_SETUP=1` re-runs.
+- Managed llama.cpp server supervision: pi auto-starts `llama-server` (`/health` check, pidfile, `~/.pi/agent/llama/server.log`) when the llama.cpp provider is selected at interactive startup, and leaves it running after exit so models stay warm. `PI_LLAMA_AUTOSTART=0` disables; `/llama` now offers **Stop server**. Vulkan builds are installed when a Vulkan driver is detected (macOS always Metal), CPU otherwise.
+
 ## [0.85.1] - 2026-09-05
 
 ### Changed

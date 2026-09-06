@@ -69,7 +69,7 @@ const TOOLS: Record<string, ToolConfig> = {
 };
 
 // Check if a command exists in PATH by trying to run it
-function commandExists(cmd: string): boolean {
+export function commandExists(cmd: string): boolean {
 	try {
 		const result = spawnSync(cmd, ["--version"], { stdio: "pipe" });
 		// Check for ENOENT error (command not found)
@@ -138,7 +138,7 @@ export async function getLatestVersion(repo: string): Promise<string> {
 }
 
 // Download a file from URL
-async function downloadFile(url: string, dest: string): Promise<void> {
+export async function downloadFile(url: string, dest: string): Promise<void> {
 	const response = await fetchWithRetry(url, undefined, { timeoutMs: DOWNLOAD_TIMEOUT_MS });
 
 	if (!response.ok) {
@@ -153,7 +153,7 @@ async function downloadFile(url: string, dest: string): Promise<void> {
 	await pipeline(Readable.fromWeb(response.body as any), fileStream);
 }
 
-function findBinaryRecursively(rootDir: string, binaryFileName: string): string | null {
+export function findBinaryRecursively(rootDir: string, binaryFileName: string): string | null {
 	const stack: string[] = [rootDir];
 
 	while (stack.length > 0) {
@@ -198,7 +198,7 @@ function runExtractionCommand(command: string, args: string[]): string | null {
 	return `${command}: ${formatSpawnFailure(result)}`;
 }
 
-function extractTarGzArchive(archivePath: string, extractDir: string, assetName: string): void {
+export function extractTarGzArchive(archivePath: string, extractDir: string, assetName: string): void {
 	const failure = runExtractionCommand("tar", ["xzf", archivePath, "-C", extractDir]);
 	if (failure) {
 		throw new Error(`Failed to extract ${assetName}: ${failure}`);
@@ -216,7 +216,7 @@ function getWindowsTarCommand(): string {
 	return "tar.exe";
 }
 
-function extractZipArchive(archivePath: string, extractDir: string, assetName: string): void {
+export function extractZipArchive(archivePath: string, extractDir: string, assetName: string): void {
 	const failures: string[] = [];
 
 	if (platform() === "win32") {

@@ -114,6 +114,7 @@ export interface Settings {
 	npmCommand?: string[]; // Command used for npm package lookup/install operations, argv-style (e.g., ["mise", "exec", "node@20", "--", "npm"])
 	collapseChangelog?: boolean; // Show condensed changelog after update (use /changelog for full)
 	enableInstallTelemetry?: boolean; // default: true - anonymous version/update ping after changelog-detected updates
+	llamaOnboarding?: "complete" | "skipped"; // first-run provider onboarding has run (llama.cpp default setup)
 	enableAnalytics?: boolean; // default: false - opt-in analytics data sharing
 	trackingId?: string; // analytics tracking identifier, generated when analytics is enabled
 	packages?: PackageSource[]; // Array of npm/git package sources (string or object with filtering)
@@ -739,6 +740,16 @@ export class SettingsManager {
 		this.globalSettings.defaultModel = modelId;
 		this.markModified("defaultProvider");
 		this.markModified("defaultModel");
+		this.save();
+	}
+
+	getLlamaOnboarding(): "complete" | "skipped" | undefined {
+		return this.globalSettings.llamaOnboarding;
+	}
+
+	setLlamaOnboarding(value: "complete" | "skipped"): void {
+		this.globalSettings.llamaOnboarding = value;
+		this.markModified("llamaOnboarding");
 		this.save();
 	}
 

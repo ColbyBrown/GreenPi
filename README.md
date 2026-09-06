@@ -14,7 +14,7 @@
 
 This is the home of the Pi agent harness project including our self extensible coding agent.
 
-This fork is **local-first**: your code, sessions, and model traffic stay on your machine by default. Cloud LLM providers are limited to **[GreenPT](https://greenpt.com)** and **[Viro AI](https://ai.viro.app)**; all other built-in cloud providers (OpenAI, Anthropic, Google, etc.) are no longer registered by the default runtime. Use local inference instead — LM Studio, Ollama, vLLM, or the llama.cpp router server (`/login llama.cpp`, `/llama`) — or declare other cloud endpoints via `models.json` if you must.
+This fork is **local-first**: your code, sessions, and model traffic stay on your machine by default. On first startup, pi offers to install and run a local llama.cpp server as the default provider (local inference: llama.cpp, LM Studio, Ollama, vLLM). Cloud LLM providers are limited to **[GreenPT](https://greenpt.com)** and **[Viro AI](https://ai.viro.app)**; all other built-in cloud providers (OpenAI, Anthropic, Google, etc.) are no longer registered by the default runtime, but can be declared via `models.json` if you must.
 
 * **[@earendil-works/pi-coding-agent](packages/coding-agent)**: Interactive coding agent CLI
 * **[@earendil-works/pi-agent-core](packages/agent)**: Agent runtime with tool calling and state management

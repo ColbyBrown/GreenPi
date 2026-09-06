@@ -1,4 +1,5 @@
 import type { ExtensionAPI, ExtensionCommandContext } from "../../core/extensions/types.ts";
+import { stopLlamaServer } from "../../core/llama-server.ts";
 import { formatBytes, LlamaClient, type LlamaModelInfo, normalizeLlamaServerUrl } from "./client.ts";
 import { findHuggingFaceToken, HuggingFaceClient } from "./huggingface.ts";
 import { createLlamaProvider, LLAMA_PROVIDER_ID } from "./provider.ts";
@@ -210,7 +211,18 @@ export default function llamaExtension(pi: ExtensionAPI): void {
 					let actionError: unknown;
 					try {
 						if (action.type === "download") await downloadModel(ctx, ui, client);
-						else if (modelIsLoaded(action.model)) await unloadModel(ctx, ui, client, action.model);
+						else if (action.type === "stop-server") {
+							if (
+								await ui.confirm(
+									"Stop server?",
+									"Loaded models are unloaded; pi auto-starts the server again on next launch.",
+								)
+							) {
+								await stopLlamaServer();
+								ctx.ui.notify("Stopped llama.cpp server");
+								return;
+							}
+						} else if (modelIsLoaded(action.model)) await unloadModel(ctx, ui, client, action.model);
 						else if (action.model.status.value === "unloaded")
 							await loadModel(ctx, ui, client, catalog, action.model);
 						else ctx.ui.notify(`${action.model.id} is ${action.model.status.value}`, "warning");
