@@ -10,9 +10,9 @@
 
 > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-# Pi Agent Harness (local-first fork)
+# GreenPi Agent Harness (local-first fork)
 
-This is the home of the Pi agent harness project including our self extensible coding agent.
+This is the home of the GreenPi agent harness project including our self extensible coding agent.
 
 This fork is **local-first**: your code, sessions, and model traffic stay on your machine by default. On first startup, pi offers to install and run a local llama.cpp server as the default provider (local inference: llama.cpp, LM Studio, Ollama, vLLM). Cloud LLM providers are limited to **[GreenPT](https://greenpt.com)** and **[Viro AI](https://ai.viro.app)**; all other built-in cloud providers (OpenAI, Anthropic, Google, etc.) are no longer registered by the default runtime, but can be declared via `models.json` if you must.
 
@@ -20,7 +20,7 @@ This fork is **local-first**: your code, sessions, and model traffic stay on you
 * **[@earendil-works/pi-agent-core](packages/agent)**: Agent runtime with tool calling and state management
 * **[@earendil-works/pi-ai](packages/ai)**: Unified multi-provider LLM API, local-first (GreenPT, Viro AI, and local OpenAI-compatible servers)
 
-To learn more about Pi:
+To learn more about GreenPi:
 
 * [Visit pi.dev](https://pi.dev), the project website with demos
 * [Read the documentation](https://pi.dev/docs/latest), but you can also ask the agent to explain itself
@@ -50,7 +50,7 @@ If you need stronger boundaries, containerize or sandbox Pi. See [packages/codin
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for Pi can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for GreenPi can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
 
 ## Development
 
