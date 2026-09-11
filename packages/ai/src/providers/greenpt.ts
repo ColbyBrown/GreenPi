@@ -2,6 +2,7 @@ import { openAICompletionsApi } from "../api/openai-completions.lazy.ts";
 import { envApiKeyAuth } from "../auth/helpers.ts";
 import { createProvider, type Provider } from "../models.ts";
 import type { Model, OpenAICompletionsCompat } from "../types.ts";
+import { fetchOpenAICompatibleModels } from "./local.ts";
 
 // OpenAI-compatible API endpoint (https://docs.greenpt.ai). The marketing URL
 // https://greenpt.com/api documents the same service.
@@ -234,6 +235,20 @@ export function greenptProvider(): Provider<"openai-completions"> {
 		baseUrl: GREENPT_BASE_URL,
 		auth: { apiKey: envApiKeyAuth("GreenPT API key", ["GREENPT_API_KEY"]) },
 		models: GREENPT_MODELS.map(greenptModel),
+		// Live catalog (GET /v1/models) merged over the static table: known ids
+		// keep their documented cost/context metadata, new ids come through with
+		// fetchOpenAICompatibleModels' defaults.
+		fetchModels: async (context) => {
+			const fetched = await fetchOpenAICompatibleModels(
+				"greenpt",
+				GREENPT_BASE_URL,
+				context.signal,
+				context.credential?.type === "api_key" ? context.credential.key : undefined,
+			);
+			if (fetched.length === 0) return fetched;
+			const byId = new Map(GREENPT_MODELS.map((spec) => [spec.id, greenptModel(spec)]));
+			return fetched.map((model) => byId.get(model.id) ?? model);
+		},
 		api: openAICompletionsApi(),
 	});
 }
